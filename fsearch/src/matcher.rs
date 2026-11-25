@@ -63,10 +63,9 @@ impl Matcher {
                 if re.is_match(&hay) {
                     return true;
                 }
-                if full_path
-                    && let Some(text) = normalize_path(rel) {
-                        return re.is_match(&text);
-                    }
+                if full_path && let Some(text) = normalize_path(rel) {
+                    return re.is_match(&text);
+                }
                 false
             }
         }

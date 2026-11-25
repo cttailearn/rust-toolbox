@@ -1,52 +1,48 @@
-# fsearch
+# rust-toolbox
 
-**极速目录 / 文件名关键词检索 CLI**（Rust，并行遍历）。
+Rust 小工具集：**一个目录一个工具**，每个工具独立成 crate，由根目录的 Cargo workspace 统一构建。
 
-在指定目录下递归检索**目录名与文件名**，命中即输出。为「在 D 盘这种千万级条目的大目录里秒级捞文件」而写：多线程并行遍历、边遍历边匹配边输出、匹配直接跑在 OS 原生字节上。
+## 工具列表
 
-```powershell
-fsearch 报告                      # 当前目录下所有名字含“报告”的文件和目录
-fsearch -d D:\ 报告 -n 20          # 在 D 盘检索，够了就停
-fsearch -d D:\ 设计 -t psd,blend   # 只找 psd / blend 文件
-fsearch -r '^20\d\d' -d D:\AI      # 正则匹配
-fsearch src/main -d .              # 带分隔符的关键词自动按相对路径匹配
-```
+| 目录 | 工具 | 说明 |
+| --- | --- | --- |
+| [`fsearch/`](fsearch/README.md) | fsearch | 并行目录 / 文件名关键词检索 CLI。`C:\Windows` 35.8 万项 2.6–3.1 s，`D:\` 273.5 万项 2.9 s |
+| — | — | 下一个工具：`cargo new <tool>`，加入 `members` 即可 |
 
-## 实测
-
-| 检索根 | 遍历条目 | 命中 | 耗时 | 吞吐 |
-| --- | ---: | ---: | ---: | ---: |
-| `C:\Windows` | 357,842 | 84 | 2.6–3.1 s | ~12–14 万项/秒 |
-| `C:\` | 456,751 | 769 | 3.13 s | ~14.6 万项/秒 |
-| `D:\` | 2,735,454 | 358 | 2.88 s | ~95 万项/秒 |
-
-同样的 `Get-ChildItem -Recurse | Where-Object Name -like '*node*'` 扫 `C:\Windows` 需要 **70.29 s**，约 23 倍差距。
-
-## 构建
+## 快速开始
 
 ```bash
-cargo build --release        # 产物 fsearch/target/release/fsearch(.exe)，约 2.1 MB
-cargo test                   # 7 个匹配器单元测试
-cargo clippy --all-targets -- -D warnings
+cargo build --release          # 所有工具，产物在 target/release/
+cargo test --workspace
 ```
 
-## 安装
+只构建/运行某一个工具：
 
 ```bash
-cargo install --path fsearch
-# 或把 fsearch/target/release 加入 PATH
+cargo run --release -p fsearch -- 报告 -d D:\ -n 20
 ```
 
-## 仓库结构
+## 新增一个工具
+
+```bash
+cargo new --bin mytool         # 在仓库根目录创建
+# 1. 把 "mytool" 加进根 Cargo.toml 的 members
+# 2. 在根 README.md 的「工具列表」加一行
+cargo build --release          # 统一构建，release 配置已在根 Cargo.toml 里
+```
+
+约定见 [AGENTS.md](AGENTS.md)：newtype 优先、线程间用 channel 而非 `Arc<Mutex<_>>`、高频循环里避免堆分配。
+
+## 目录结构
 
 ```
-AGENTS.md           # 本仓库 AI 编码代理的工作约定
-fsearch/            # 唯一的 crate：参数解析、并行遍历、匹配器、输出
-  src/main.rs
-  src/matcher.rs
-  README.md         # 完整参数表、实现要点、限制
+Cargo.toml        # workspace 根：成员列表 + 全仓库 release 配置
+AGENTS.md         # AI 编码代理的工作约定
+fsearch/          # 工具一：并行关键词检索
+  Cargo.toml
+  src/main.rs     # CLI、并行遍历、输出
+  src/matcher.rs  # 零分配匹配器 + 单元测试
+  README.md       # 参数表、实测数据、实现要点
 ```
 
-> `AGENTS.md` 中提到本地练习 crate `hello_rust/` 属于开发者的本地工作区，不包含在本仓库中。
-
-完整参数与实现说明见 [fsearch/README.md](fsearch/README.md)。
+> `AGENTS.md` 里提到的本地练习 crate `hello_rust/` 不在本仓库中。

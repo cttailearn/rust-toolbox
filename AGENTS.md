@@ -4,13 +4,17 @@
 
 ## 仓库概览
 
-- `fsearch/` — 并行目录/文件名关键词检索 CLI（Rust 2024 edition，`anyhow` + `clap` + `ignore` + `memchr` + `regex`）
-- `hello_rust/` — 练习用 crate
-- 所有 crate 使用 `edition = "2024"`
+本仓库是 Rust 小工具集：**一个目录一个工具**，每个工具独立成 crate，由根目录的 Cargo workspace 统一构建。
+
+- `fsearch/` — 并行目录/文件名关键词检索 CLI（`anyhow` + `clap` + `ignore` + `memchr` + `regex`）
+- 新增工具：在仓库根目录 `cargo new <tool>`，把名字加进根 `Cargo.toml` 的 `members`，并在根 `README.md` 的工具表里加一行
+- 所有 crate 使用 `edition = "2024"`；`[profile.release]` 统一放在根 `Cargo.toml`（成员 crate 内的配置会被忽略）
+
+> 开发者本地另有练习 crate `hello_rust/`，不属于本仓库。
 
 ## 构建与验证
 
-提交前必须全部通过：
+以下命令**全部在仓库根目录执行**，提交前必须全部通过：
 
 ```bash
 cargo fmt --all --check
@@ -18,7 +22,7 @@ cargo clippy --all-targets --all-features -- -D warnings
 cargo test --all
 ```
 
-`fsearch` 的 release profile 已开启 `lto = "thin"`、`codegen-units = 1`、`panic = "abort"`，改动后可用 `cargo build --release` 验证。
+根 `Cargo.toml` 的 `[profile.release]` 已开启 `lto = "thin"`、`codegen-units = 1`、`panic = "abort"`，改动后可用 `cargo build --release` 验证。
 
 ## Rust 设计准则（强制）
 

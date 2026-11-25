@@ -22,15 +22,16 @@ fsearch -d D:\ 截图 -n 20        # 只列前 20 条，够了就立刻停
 
 ## 二、构建与安装
 
-```powershell
-cd D:\AI\rust学习\fsearch
-cargo build --release --offline        # 产物约 2.1 MB（lto + strip）
+```bash
+# 在仓库根目录（rust-toolbox/）执行；fsearch 是 workspace 成员
+cargo build --release          # 产物 target/release/fsearch(.exe)，约 2.1 MB
+cargo run --release -p fsearch -- 报告 -d D:\
 ```
 
-把它加入 PATH，之后任意目录直接 `fsearch`：
+把 `target/release` 加入 PATH，之后任意目录直接 `fsearch`：
 
 ```powershell
-$dir = 'D:\AI\rust学习\fsearch\target\release'
+$dir = '<仓库根目录>\target\release'
 [Environment]::SetEnvironmentVariable(
   'Path',
   [Environment]::GetEnvironmentVariable('Path','User') + ";$dir",
@@ -39,8 +40,8 @@ $dir = 'D:\AI\rust学习\fsearch\target\release'
 
 或者用 cargo 装到 `%USERPROFILE%\.cargo\bin`（该目录通常已在 PATH 里）：
 
-```powershell
-cargo install --path . --offline
+```bash
+cargo install --path fsearch
 ```
 
 ## 三、参数

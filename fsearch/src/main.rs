@@ -200,10 +200,11 @@ impl Out {
         }
         let mut w = self.inner.lock().unwrap_or_else(|e| e.into_inner());
         if let Err(err) = w.write_all(data)
-            && err.kind() == io::ErrorKind::BrokenPipe {
-                self.broken.store(true, Ordering::Relaxed);
-                return false;
-            }
+            && err.kind() == io::ErrorKind::BrokenPipe
+        {
+            self.broken.store(true, Ordering::Relaxed);
+            return false;
+        }
         true
     }
 
@@ -481,9 +482,10 @@ fn push_entry(buf: &mut Vec<u8>, abs: &Path, display: &Path, is_dir: bool, cfg: 
         buf.extend_from_slice(b",\"kind\":");
         buf.extend_from_slice(if is_dir { b"\"dir\"" } else { b"\"file\"" });
         if let Some(meta) = meta
-            && !is_dir {
-                let _ = write!(buf, ",\"size\":{}", meta.len());
-            }
+            && !is_dir
+        {
+            let _ = write!(buf, ",\"size\":{}", meta.len());
+        }
         buf.extend_from_slice(b"}\n");
         return;
     }

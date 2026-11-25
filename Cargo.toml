@@ -1,0 +1,12 @@
+[workspace]
+resolver = "3"
+members = ["fsearch"]
+
+# 全仓库共用的 release 配置：小工具都以单文件二进制分发，
+# 统一开 LTO / 单 codegen unit / strip。成员 crate 内的 [profile.*] 会被忽略。
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+strip = true
