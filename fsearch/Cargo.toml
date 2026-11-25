@@ -1,0 +1,19 @@
+[package]
+name = "fsearch"
+version = "0.1.0"
+edition = "2024"
+description = "极速目录/文件名关键词检索 CLI（并行遍历）"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+ignore = "0.4"
+memchr = "2"
+regex = "1"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+strip = true
